@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings">Ayarlar</string>
+    <string name="back">Geri</string>
+    <string name="connect">Bağlan</string>
+    <string name="disconnect">Bağlantıyı kes</string>
+    <string name="status_on">Bağlı</string>
+    <string name="status_off">Bağlı değil</string>
+    <string name="status_connecting">Bağlanıyor…</string>
+    <string name="hint_on">DPI atlatma etkin</string>
+    <string name="hint_off">Başlatmak için dokun</string>
+    <string name="dns">DNS</string>
+    <string name="upload">Gönderilen</string>
+    <string name="download">Alınan</string>
+    <string name="section_theme">Tema</string>
+    <string name="theme_system">Sistem</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="section_dns">DNS</string>
+    <string name="dns_custom">Özel</string>
+    <string name="dns_custom_hint">IPv4 adresi gir</string>
+    <string name="dns_invalid">Geçersiz IPv4 adresi</string>
+    <string name="doh">DNS over HTTPS</string>
+    <string name="doh_desc">DNS sorgularını şifreler, olmazsa normal DNS kullanır</string>
+    <string name="section_bypass">Atlatma</string>
+    <string name="split_tls">HTTPS bölme</string>
+    <string name="split_tls_desc">TLS el sıkışmasını SNI noktasında parçalar</string>
+    <string name="split_record">TLS kaydını böl</string>
+    <string name="split_record_desc">ClientHello paketini iki TLS kaydı olarak gönderir</string>
+    <string name="http_tricks">HTTP başlık hileleri</string>
+    <string name="http_tricks_desc">Host başlığını değiştirir ve parçalar</string>
+    <string name="block_quic">QUIC engelle</string>
+    <string name="block_quic_desc">Tarayıcıları HTTPS için TCP kullanmaya zorlar</string>
+    <string name="save">Kaydet</string>
+    <string name="cancel">İptal</string>
+    <string name="version">Sürüm %1$s</string>
+    <string name="notification_channel">VPN durumu</string>
+    <string name="notification_text">Etkin · DNS %1$s</string>
+    <string name="action_stop">Durdur</string>
+</resources>

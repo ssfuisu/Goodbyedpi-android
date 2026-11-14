@@ -1,0 +1,108 @@
+name: Build
+
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["**.md"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Fetch native sources
+        run: ./scripts/fetch-native.sh
+
+      - name: Prepare signing key
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          KS="$RUNNER_TEMP/release.jks"
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$KS"
+            {
+              echo "KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD"
+              echo "KEY_ALIAS=$KEY_ALIAS"
+              echo "KEY_PASSWORD=${KEY_PASSWORD:-$KEYSTORE_PASSWORD}"
+            } >> "$GITHUB_ENV"
+          else
+            echo "::warning::KEYSTORE_BASE64 secret not set, signing with a temporary key."
+            PASS="$(openssl rand -hex 16)"
+            echo "::add-mask::$PASS"
+            keytool -genkeypair -keystore "$KS" -storetype PKCS12 -alias release \
+              -keyalg RSA -keysize 4096 -validity 10000 -storepass "$PASS" -keypass "$PASS" \
+              -dname "CN=GoodbyeDPI Android"
+            {
+              echo "KEYSTORE_PASSWORD=$PASS"
+              echo "KEY_ALIAS=release"
+              echo "KEY_PASSWORD=$PASS"
+            } >> "$GITHUB_ENV"
+          fi
+          echo "KEYSTORE_FILE=$KS" >> "$GITHUB_ENV"
+
+      - name: Test
+        run: ./gradlew testReleaseUnitTest --no-daemon
+
+      - name: Build
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Collect APKs
+        id: apk
+        run: |
+          VERSION="$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)"
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-arm64-v8a-release.apk "dist/GoodbyeDPI-$VERSION-arm64-v8a.apk"
+          cp app/build/outputs/apk/release/app-armeabi-v7a-release.apk "dist/GoodbyeDPI-$VERSION-armeabi-v7a.apk"
+          "$ANDROID_HOME/build-tools/$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -1)/apksigner" verify dist/*.apk
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: GoodbyeDPI-${{ steps.apk.outputs.version }}
+          path: dist/*.apk
+
+      - name: Check release
+        id: rel
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v${{ steps.apk.outputs.version }}" >/dev/null 2>&1; then
+            echo "create=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "create=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish release
+        if: steps.rel.outputs.create == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.apk.outputs.version }}
+          name: GoodbyeDPI ${{ steps.apk.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          body: |
+            DPI bypass for Android. No root required.
+
+            - `arm64-v8a`: 64-bit devices (most phones)
+            - `armeabi-v7a`: 32-bit devices
+          files: dist/*.apk

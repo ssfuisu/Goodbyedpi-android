@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">GoodbyeDPI</string>
+    <string name="settings">Settings</string>
+    <string name="back">Back</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="status_on">Connected</string>
+    <string name="status_off">Disconnected</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="hint_on">DPI bypass is active</string>
+    <string name="hint_off">Tap to start</string>
+    <string name="dns">DNS</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="section_theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="section_dns">DNS</string>
+    <string name="dns_custom">Custom</string>
+    <string name="dns_custom_hint">Enter an IPv4 address</string>
+    <string name="dns_invalid">Invalid IPv4 address</string>
+    <string name="doh">DNS over HTTPS</string>
+    <string name="doh_desc">Encrypt DNS queries, falls back to plain DNS</string>
+    <string name="section_bypass">Bypass</string>
+    <string name="split_tls">Split HTTPS</string>
+    <string name="split_tls_desc">Fragment the TLS handshake at the SNI</string>
+    <string name="split_record">Split TLS record</string>
+    <string name="split_record_desc">Send the ClientHello as two TLS records</string>
+    <string name="http_tricks">HTTP header tricks</string>
+    <string name="http_tricks_desc">Modify and fragment the Host header</string>
+    <string name="block_quic">Block QUIC</string>
+    <string name="block_quic_desc">Force browsers to use TCP for HTTPS</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="version">Version %1$s</string>
+    <string name="notification_channel">VPN status</string>
+    <string name="notification_text">Active · DNS %1$s</string>
+    <string name="action_stop">Stop</string>
+</resources>
